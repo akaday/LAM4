@@ -75,3 +75,19 @@ The agent could then propose a more optimized approach, like utilizing multi-thr
 After modifying the code, the agent would run automated tests to ensure accuracy and performance improvements.
 Conclusion:
 LAM4 can evolve into a powerful AI assistant for researchers, capable of autonomously improving code quality, performance, and readability while adapting to new research challenges. By integrating AI/ML models, reinforcement learning, and automated testing pipelines, the project can become an invaluable tool for continuous research code evolution.
+
+### Setting the PYTHONPATH Environment Variable
+
+Before running the code or tests, you need to set the `PYTHONPATH` environment variable to include the `src` directory. This ensures that the Python interpreter can locate the modules in the `src` directory.
+
+For example, on a Unix-based system, you can set the `PYTHONPATH` as follows:
+
+```bash
+export PYTHONPATH=$PYTHONPATH:$(pwd)/src
+```
+
+On Windows, you can set the `PYTHONPATH` using the `set` command:
+
+```cmd
+set PYTHONPATH=%PYTHONPATH%;%cd%\src
+```
