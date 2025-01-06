@@ -1,11 +1,19 @@
 import unittest
-from src.main import sample_function
+from lam4.src.main import optimize_code
 
-class TestSampleFunction(unittest.TestCase):
-    def test_sample_function(self):
-        self.assertEqual(sample_function(2, 3), 5)
-        self.assertEqual(sample_function(-1, 1), 0)
-        self.assertEqual(sample_function(0, 0), 0)
+class TestOptimizeCode(unittest.TestCase):
+    def test_optimize_code(self):
+        code = """
+        def example_function():
+            result = redundant_computation()
+            return result
+        """
+        optimized_code = optimize_code(code)
+        expected_code = """
+        def example_function():
+            return result
+        """
+        self.assertEqual(optimized_code.strip(), expected_code.strip())
 
 if __name__ == '__main__':
     unittest.main()
