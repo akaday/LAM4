@@ -1,9 +1,12 @@
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
+
+# Add the src directory to the Python path explicitly
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
+
+from main import sample_function
 
 import unittest
-from src.main import sample_function
 
 class TestSampleFunction(unittest.TestCase):
     def test_sample_function(self):

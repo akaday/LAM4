@@ -9,6 +9,12 @@ def optimize_code(code):
     optimized_code = code.replace("redundant_computation()", "")
     return optimized_code
 
+def sample_function(a, b):
+    """
+    Sample function to add two numbers.
+    """
+    return a + b
+
 def main():
     # Sample code to be optimized
     code = """
