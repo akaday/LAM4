@@ -1,5 +1,7 @@
 import re
 import pylint.lint
+from transformers import RobertaTokenizer, RobertaForMaskedLM, Trainer, TrainingArguments
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 def remove_redundant_computations(code):
     """
@@ -49,6 +51,72 @@ def optimize_code(code):
     code = optimize_loops(code)
     code = integrate_static_code_analysis(code)
     return code
+
+def fine_tune_codebert(task, dataset):
+    """
+    Function to fine-tune CodeBERT for code completion, bug detection, and code refactoring.
+    """
+    tokenizer = RobertaTokenizer.from_pretrained("microsoft/codebert-base")
+    model = RobertaForMaskedLM.from_pretrained("microsoft/codebert-base")
+
+    def tokenize_function(examples):
+        return tokenizer(examples["text"], padding="max_length", truncation=True)
+
+    tokenized_datasets = dataset.map(tokenize_function, batched=True)
+
+    training_args = TrainingArguments(
+        output_dir="./results",
+        evaluation_strategy="epoch",
+        learning_rate=2e-5,
+        per_device_train_batch_size=16,
+        per_device_eval_batch_size=16,
+        num_train_epochs=3,
+        weight_decay=0.01,
+    )
+
+    trainer = Trainer(
+        model=model,
+        args=training_args,
+        train_dataset=tokenized_datasets["train"],
+        eval_dataset=tokenized_datasets["test"],
+    )
+
+    trainer.train()
+    return model
+
+def evaluate_model_performance(model, eval_dataset, task):
+    """
+    Function to evaluate the performance of the fine-tuned models using specified metrics.
+    """
+    tokenizer = RobertaTokenizer.from_pretrained("microsoft/codebert-base")
+
+    def tokenize_function(examples):
+        return tokenizer(examples["text"], padding="max_length", truncation=True)
+
+    tokenized_eval_dataset = eval_dataset.map(tokenize_function, batched=True)
+
+    predictions = model.predict(tokenized_eval_dataset["test"])
+    preds = predictions.predictions.argmax(-1)
+
+    if task == "code_completion":
+        accuracy = accuracy_score(tokenized_eval_dataset["test"]["labels"], preds)
+        return {"accuracy": accuracy}
+    elif task == "bug_detection":
+        precision = precision_score(tokenized_eval_dataset["test"]["labels"], preds)
+        recall = recall_score(tokenized_eval_dataset["test"]["labels"], preds)
+        f1 = f1_score(tokenized_eval_dataset["test"]["labels"], preds)
+        return {"precision": precision, "recall": recall, "f1": f1}
+    elif task == "code_refactoring":
+        # Placeholder for code quality and maintainability metrics
+        return {"code_quality": 0, "maintainability": 0}
+
+def integrate_fine_tuned_models(models, pipeline):
+    """
+    Function to integrate the fine-tuned models into the code improvement pipeline.
+    """
+    for task, model in models.items():
+        pipeline[task] = model
+    return pipeline
 
 def main():
     # Sample code to be optimized

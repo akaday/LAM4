@@ -1,1 +1,4 @@
 pytest
+transformers
+scikit-learn
+datasets
